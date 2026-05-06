@@ -2,10 +2,11 @@ import os
 
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
+
 
 def main():
     print("Hello from langchain-course!")
@@ -23,7 +24,7 @@ def main():
     ollama_endpoint = os.getenv("OLLAMA_LOCAL_ENDPOINT")
     if ollama_endpoint:
         llm = ChatOllama(model="llama3", temperature=0, base_url=ollama_endpoint)
-        #consider upgrading to model gpt-oss for agentic ai use cases 
+        # consider upgrading to model gpt-oss for agentic ai use cases
     else:
         llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
