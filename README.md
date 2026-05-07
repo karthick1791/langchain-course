@@ -1,19 +1,20 @@
 # LangChain Course
 
-A learning project demonstrating LangChain usage with different LLM backends for text summarization and fact extraction.
+A learning project demonstrating LangChain usage with different LLM backends for text summarization, fact extraction, and agent-based search.
 
 ## Overview
 
-This project showcases how to use LangChain to build an AI-powered text processing pipeline. It takes biographical information as input and uses an LLM to:
+This repository contains two main Python experiments:
 
-1. Generate a short summary
-2. Extract 2 interesting facts about the person
+- `mainLlmIntegration.py`: Uses LangChain prompt templates and integrates with either Ollama or OpenAI to summarize a biography and extract interesting facts.
+- `mainSearchAgent.py`: Experiments with a tool-enabled agent using Ollama and a search function stub, plus an optional Tavily search helper.
 
 ## Features
 
-- **Flexible LLM Support**: Automatically switches between local (Ollama) and cloud-based (OpenAI) LLMs
+- **Flexible LLM Support**: Switches between local Ollama and cloud OpenAI based on environment configuration
 - **Prompt Templates**: Uses LangChain's `PromptTemplate` for structured prompt engineering
-- **Environment Configuration**: Loads configuration from `.env` file using `python-dotenv`
+- **Agent Tools**: Demonstrates LangChain agent creation and tool invocation
+- **Environment Configuration**: Loads configuration from `.env` using `python-dotenv`
 
 ## Prerequisites
 
@@ -46,19 +47,17 @@ This will install all packages listed in `pyproject.toml`:
 
 ### Environment Variables
 
-Create a `.env` file in the project root with the following variables:
+Create a `.env` file in the project root with one or more of these variables:
 
-#### Option 1: Use Local Ollama (Recommended for Development)
 ```env
 OLLAMA_LOCAL_ENDPOINT=http://localhost:11434
-```
-
-#### Option 2: Use OpenAI
-```env
+OOLAMA_MODEL_NAME=llama3
 OPENAI_API_KEY=your-openai-api-key-here
+OPENAI_MODEL_NAME=gpt-4o
 ```
 
-**Note**: If `OLLAMA_LOCAL_ENDPOINT` is set, the application will use Ollama. Otherwise, it falls back to OpenAI.
+- If `OLLAMA_LOCAL_ENDPOINT` is set, `mainLlmIntegration.py` and `mainSearchAgent.py` will use Ollama.
+- Otherwise, `mainLlmIntegration.py` falls back to OpenAI if `OPENAI_API_KEY` is provided.
 
 ### Setting Up Ollama (Optional)
 
@@ -76,45 +75,58 @@ To use the local Ollama backend:
 
 ## Usage
 
-Run the application:
+Run the integration script:
 
 ```bash
-python -m main
+python -m mainLlmIntegration
 ```
 
-The script will:
-1. Load the `.env` file
-2. Determine which LLM to use based on environment variables
-3. Create a prompt template for summarization and fact extraction
-4. Process sample biographical data (Elon Musk) using the selected LLM
-5. Print the generated summary and facts
+Run the search agent experiment:
+
+```bash
+python -m mainSearchAgent
+```
+
+## File Descriptions
+
+### `mainLlmIntegration.py`
+
+- Loads environment settings with `python-dotenv`
+- Builds a prompt template for summarizing a biography and extracting two interesting facts
+- Selects either `ChatOllama` or `ChatOpenAI` depending on configuration
+- Invokes the prompt chain and prints the LLM response
+
+### `mainSearchAgent.py`
+
+- Defines a simple LangChain tool named `search`
+- Uses `create_agent` to build an agent with Ollama as the model backend
+- Demonstrates invoking the agent with a human query about Tamil Nadu elections
+- Includes a `search_web` helper using `TavilyClient` for optional web search integration
 
 ## Project Structure
 
 ```
 langchain-course/
-├── main.py              # Main application script
-├── pyproject.toml       # Project configuration and dependencies
-├── README.md            # This file
-└── .env                 # Environment variables (create this file)
+├── mainLlmIntegration.py   # LLM integration experiment with prompt templates
+├── mainSearchAgent.py      # Agent + tool experiment using Ollama and search
+├── pyproject.toml          # Project configuration and dependencies
+├── README.md               # This file
+└── .env                    # Environment variables (create this file)
 ```
 
 ## How It Works
 
-### LLM Selection Logic
+### `mainLlmIntegration.py`
 
-```python
-if OLLAMA_LOCAL_ENDPOINT is set:
-    Use ChatOllama with llama3 model
-else:
-    Use ChatOpenAI with gpt-4o model
-```
+- Uses a `PromptTemplate` to structure the request
+- Chooses between Ollama and OpenAI models
+- Runs a prompt chain and prints the formatted output
 
-### Processing Pipeline
+### `mainSearchAgent.py`
 
-1. **Prompt Template**: Defines the structure of the request to the LLM
-2. **Chain**: Connects the prompt template to the selected LLM
-3. **Invocation**: Processes the input and returns the LLM response
+- Registers a tool for search queries
+- Creates an agent that can call the tool
+- Sends a user prompt to the agent and prints the result
 
 ## Dependencies
 
@@ -174,4 +186,4 @@ Add appropriate license information here.
 
 ## Notes
 
-The `temperature=0` setting used for both LLMs ensures deterministic, consistent outputs for reproducibility.
+The `temperature=0` setting used in the scripts ensures deterministic, consistent outputs for reproducibility.
