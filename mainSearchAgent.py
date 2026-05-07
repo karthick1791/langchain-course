@@ -8,9 +8,14 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_ollama import ChatOllama
+from langchain_tavily import TavilySearch
+
+ollama_model_name=os.getenv("OOLAMA_MODEL_NAME")
+ollama_endpoint=os.getenv("OLLAMA_LOCAL_ENDPOINT")
+tavily_api_key=os.getenv("TAVILY_API_KEY")
 
 def get_ollama_llm():
-    return ChatOllama(model="llama3", temperature=0, base_url=os.getenv("OLLAMA_LOCAL_ENDPOINT"))
+    return ChatOllama(model=ollama_model_name, temperature=0, base_url=ollama_endpoint)
 
 @tool
 def search(query: str) -> str:
@@ -19,34 +24,21 @@ def search(query: str) -> str:
     Args:        query (str): The search query
     Returns:     str: The search results
     """
-    return "May be TVK wil form the Govt"
-
-def search_web(query: str) -> str:
-    client = TavilyClient("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")
-    response = client.search(
-    query=query,
-    search_depth="advanced"
-    )
+    client = TavilyClient(api_key=tavily_api_key)
+    print(f"Searching for: {query} using Tavily API")
+    response = client.search(query=query)
     return response
-
 
 def main():
     print("Hello from search agent!")
-    #(search_web("What are the latest updates on Tamil Nadu elections?"))
     
     llm = get_ollama_llm()
-    tools = [search]
+    tools = [TavilySearch()] # using langChain wrapper for Tavily Search as a tool in the agent, this helps adding right parameters to the Tavily API
+    #tools = [search] # using the search tool which is a direct wrapper over TavilyClient, this requires us to handle the parameters
     agent = create_agent(model=llm, tools=tools)
 
-    result = agent.invoke(HumanMessage(content="What are the latest updates on Tamil Nadu elections?"))
-    print(result.content)
-
-
-# File "C:\Users\Karthick\git\langchain-course\.venv\Lib\site-packages\ollama\_client.py", line 189, in inner
-#    raise ResponseError(e.response.text, e.response.status_code) from None
-#ollama._types.ResponseError: registry.ollama.ai/library/llama3:latest does not support tools (status code: 400)
-
-# TODO: switch to gpt-oss or upgrade to latest version llama3.1 + to get tool support
+    result = agent.invoke({"messages": [HumanMessage(content="What is the weather forecast in Bangalore for the next week?")]})
+    print(result)
 
 if __name__ == "__main__":
     main()

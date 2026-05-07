@@ -7,6 +7,9 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
+ollama_model_name=os.getenv("OOLAMA_MODEL_NAME")
+ollama_endpoint=os.getenv("OLLAMA_LOCAL_ENDPOINT")
+openai_model_name=os.getenv("OPENAI_MODEL_NAME")
 
 def main():
     print("Hello from langchain-course!")
@@ -21,12 +24,10 @@ def main():
         input_variables=["information"], template=summary_template
     )
 
-    ollama_endpoint = os.getenv("OLLAMA_LOCAL_ENDPOINT")
     if ollama_endpoint:
-        llm = ChatOllama(model="llama3", temperature=0, base_url=ollama_endpoint)
-        # consider upgrading to model gpt-oss for agentic ai use cases
+        llm = ChatOllama(model=ollama_model_name, temperature=0, base_url=ollama_endpoint)
     else:
-        llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        llm = ChatOpenAI(model=openai_model_name, temperature=0)
 
     chain = prompt_template | llm
     response = chain.invoke(input={"information": information})
