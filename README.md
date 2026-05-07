@@ -7,13 +7,13 @@ A learning project demonstrating LangChain usage with different LLM backends for
 This repository contains two main Python experiments:
 
 - `mainLlmIntegration.py`: Uses LangChain prompt templates and integrates with either Ollama or OpenAI to summarize a biography and extract interesting facts.
-- `mainSearchAgent.py`: Experiments with a tool-enabled agent using Ollama and a search function stub, plus an optional Tavily search helper.
+- `mainSearchAgent.py`: Experiments with a tool-enabled agent using Ollama, `TavilySearch` from `langchain_tavily`, and a Pydantic `AgentResponse` schema for structured answers.
 
 ## Features
 
 - **Flexible LLM Support**: Switches between local Ollama and cloud OpenAI based on environment configuration
 - **Prompt Templates**: Uses LangChain's `PromptTemplate` for structured prompt engineering
-- **Agent Tools**: Demonstrates LangChain agent creation and tool invocation
+- **Agent Tools**: Demonstrates LangChain agent creation, tool invocation, and structured agent response formats
 - **Environment Configuration**: Loads configuration from `.env` using `python-dotenv`
 
 ## Prerequisites
@@ -98,10 +98,10 @@ python -m mainSearchAgent
 
 ### `mainSearchAgent.py`
 
-- Defines a simple LangChain tool named `search`
-- Uses `create_agent` to build an agent with Ollama as the model backend
-- Demonstrates invoking the agent with a human query about Tamil Nadu elections
-- Includes a `search_web` helper using `TavilyClient` for optional web search integration
+- Defines a tool-enabled LangChain agent that uses `TavilySearch()` from `langchain_tavily` as the primary search tool
+- Includes an alternate custom `@tool` wrapper for direct TavilyClient search calls
+- Uses `response_format=AgentResponse` to declare a Pydantic schema for the expected answer and sources
+- Invokes the agent with a `HumanMessage` query and prints the returned result object
 
 ## Project Structure
 
@@ -124,9 +124,10 @@ langchain-course/
 
 ### `mainSearchAgent.py`
 
-- Registers a tool for search queries
-- Creates an agent that can call the tool
-- Sends a user prompt to the agent and prints the result
+- Registers `TavilySearch` as a tool for search queries, with an optional direct TavilyClient wrapper available
+- Creates an agent using `create_agent(..., response_format=AgentResponse)` to define the output schema
+- Sends a `HumanMessage` user prompt to the agent
+- Prints the returned result object, which is expected to follow the `AgentResponse` schema
 
 ## Dependencies
 
