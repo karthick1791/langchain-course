@@ -32,6 +32,11 @@ pip install -e .
 - [mainLlmIntegration](docs/mainLlmIntegration.md)
 - [mainSearchAgent](docs/mainSearchAgent.md)
 - [1_agent_loop_langchain_tool_calling](docs/1_agent_loop_langchain_tool_calling_react_loop.md)
+- [2_agent_loop_raw_function_calling](docs/2_agent_loop_raw_function_calling.md)
+
+## Custom Agent
+
+Use the custom agent `/create-docs-for-python` to generate or refresh `docs/*.md` files for executable Python scripts and keep `README.md` updated with links to those docs.
 
 ## Environment Configuration
 
@@ -53,6 +58,7 @@ Run any script using Python module mode, for example:
 python -m mainLlmIntegration
 python -m mainSearchAgent
 python -m 1_agent_loop_langchain_tool_calling
+python -m 2_agent_loop_raw_function_calling
 ```
 
 ## Notes
