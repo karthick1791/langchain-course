@@ -7,9 +7,10 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-ollama_model_name=os.getenv("OOLAMA_MODEL_NAME")
-ollama_endpoint=os.getenv("OLLAMA_LOCAL_ENDPOINT")
-openai_model_name=os.getenv("OPENAI_MODEL_NAME")
+ollama_model_name = os.getenv("OOLAMA_MODEL_NAME")
+ollama_endpoint = os.getenv("OLLAMA_LOCAL_ENDPOINT")
+openai_model_name = os.getenv("OPENAI_MODEL_NAME")
+
 
 def main():
     print("Hello from langchain-course!")
@@ -25,7 +26,9 @@ def main():
     )
 
     if ollama_endpoint:
-        llm = ChatOllama(model=ollama_model_name, temperature=0, base_url=ollama_endpoint)
+        llm = ChatOllama(
+            model=ollama_model_name, temperature=0, base_url=ollama_endpoint
+        )
     else:
         llm = ChatOpenAI(model=openai_model_name, temperature=0)
 
