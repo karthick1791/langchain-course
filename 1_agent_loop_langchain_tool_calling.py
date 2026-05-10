@@ -70,8 +70,45 @@ def run_agent(question: str):
         HumanMessage(content=question),
     ]
 
+    for i in range(MAX_ITERATIONS):
+        print(f"\n--- Agent iteration {i+1} ---")
+
+        #React loop: Thought
+        ai_message = llm_with_tools.invoke(messages)
+        print(f"Agent response: {ai_message}")
+
+        tool_calls = ai_message.tool_calls
+        if not tool_calls:
+            print("No tool calls detected. Assuming agent is done.")
+            return ai_message.content
+        
+        #React loop: Action
+        tool_call = tool_calls[0]  # Only handle one tool call per iteration for simplicity
+        tool_name = tool_call.get("name")
+        tool_args = tool_call.get("args", {})
+        tool_call_id = tool_call.get("id")  # Unique ID for this tool call, useful for tracing and matching responses
+        
+        print(f"Detected tool call: {tool_name} with args {tool_args}")
+        if tool_name not in tools_dict:
+            print(f"Unknown tool: {tool_name}. Ignoring this tool call.")
+            continue
+        
+        tool_func = tools_dict.get(tool_name)
+        tool_result = tool_func.invoke(tool_args)
+        print(f"Tool result: {tool_result}")
+        #React loop: Action
+        
+        # React loop: Observation
+        # This observation along with historical messages is sent back to the agent in the next iteration to inform its next thought and action
+        messages.append(ai_message)
+        messages.append(ToolMessage(name=tool_name, content=str(tool_result), tool_call_id=tool_call_id)) 
+    
+    print("ERROR Max iterations reached without agent finishing. Stopping loop.")
+    return None
+
 def main():
     print("Hello from e-commerce agent!")
+    # ReAct loop : Query
     result = run_agent("What is the final price of a laptop with a gold discount?")
     print(f"Final result: {result}")
 
